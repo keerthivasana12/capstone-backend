@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Users\nathg\Downloads\Capstone\Capstone\test_explainability.py", line 16, in <module>
+    print(get_shap_explanation(data))
+          ~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\nathg\Downloads\Capstone\Capstone\services\explainability.py", line 47, in get_shap_explanation
+    feature_impact.sort(key=lambda x: abs(x[1]), reverse=True)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
