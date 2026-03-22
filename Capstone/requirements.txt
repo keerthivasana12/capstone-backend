@@ -9,3 +9,6 @@ pymongo
 transformers
 torch
 accelerate
+shap
+requests
+python-dotenv
