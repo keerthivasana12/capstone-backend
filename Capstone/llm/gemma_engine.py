@@ -16,7 +16,7 @@ class GemmaEngine:
         genai.configure(api_key=api_key)
 
         # 🔥 FAST + STABLE MODEL
-        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        self.model = genai.GenerativeModel("gemini-2.5-flash")
 
     def generate_report(self, patient, risk, recommendations, shap_explanation):
 
