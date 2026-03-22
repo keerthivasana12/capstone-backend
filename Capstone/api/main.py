@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 from services.risk_engine import predict_risk
 from services.health_score import calculate_health_score
@@ -10,7 +11,18 @@ from llm.gemma_engine import GemmaEngine
 
 app = FastAPI()
 
-llm = None  # 🔥 FIXED
+# ✅ Enable CORS (VERY IMPORTANT for React)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ✅ Load LLM once (FAST - Gemini API)
+llm = GemmaEngine()
+
 
 class Patient(BaseModel):
     patient_id: str
@@ -23,10 +35,13 @@ class Patient(BaseModel):
     physical_activity: int
 
 
+@app.get("/")
+def home():
+    return {"message": "AI Health API Running 🚀"}
+
+
 @app.post("/analyze")
 def analyze(patient: Patient):
-
-    global llm
 
     data = patient.dict()
 
@@ -54,25 +69,20 @@ def analyze(patient: Patient):
         shap_exp = "Explainability not available"
 
     # -------------------------------
-    # 🔥 5. LAZY LOAD LLM (GPU SAFE)
+    # 5. LLM Report (Gemini)
     # -------------------------------
-    if llm is None:
-        print("🔄 Loading LLM on GPU...")
-        llm = GemmaEngine()
-        print("✅ LLM Ready")
+    try:
+        report = llm.generate_report(
+            patient=data,
+            risk=risk,
+            recommendations=recs,
+            shap_explanation=shap_exp
+        )
+    except Exception as e:
+        report = f"LLM Error: {str(e)}"
 
     # -------------------------------
-    # 6. Generate Report
-    # -------------------------------
-    report = llm.generate_report(
-        patient=data,
-        risk=risk,
-        recommendations=recs,
-        shap_explanation=shap_exp
-    )
-
-    # -------------------------------
-    # 7. Save Digital Twin
+    # 6. Save Digital Twin
     # -------------------------------
     try:
         save_patient(data["patient_id"], data, risk, score)
