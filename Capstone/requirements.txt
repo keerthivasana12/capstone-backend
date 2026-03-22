@@ -11,4 +11,5 @@ torch
 accelerate
 shap
 requests
+google-generativeai
 python-dotenv
